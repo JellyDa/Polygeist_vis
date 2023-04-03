@@ -1868,6 +1868,45 @@ MLIRScanner::EmitBuiltinOps(clang::CallExpr *expr) {
                           /*isReference*/ false),
             true);
       }
+
+      // dumpInt test
+      if (sr->getDecl()->getIdentifier() && sr->getDecl()->getName() == "dump_int") {
+        std::vector<mlir::Value> args;
+        for (auto a : expr->arguments()) {
+          args.push_back(Visit(a).getValue(loc, builder));
+        }
+        // 生成原本的指令
+        auto t1 = builder.create<mlir::visualgo::DumpIntOp>(loc, args[0], args[1]);
+
+        StringRef test("testtesttest"); // trace name, maybe get from a
+        auto str = Glob.GetOrCreateGlobalLLVMString(loc, builder, test);
+
+        if(auto PT =
+                str.getType().dyn_cast<mlir::LLVM::LLVMPointerType>()) {
+          // Pointer2MemrefOp
+          // // element type is i8.
+          // auto ET = builder.getIntegerType(8);
+          // // memref size -> memref<sizexi8>
+          // int64_t size = test.size();
+          // auto expectedType = mlir::MemRefType::get({size}, ET);
+          // str = builder.create<polygeist::Pointer2MemrefOp>(loc, expectedType, str);
+
+          //GEP op
+          auto cst0 = builder.create<LLVM::ConstantOp>(
+            loc, builder.getIntegerType(64),
+            builder.getIntegerAttr(builder.getIndexType(), 0));
+          
+          str = builder.create<LLVM::GEPOp>(
+            loc, 
+            LLVM::LLVMPointerType::get(builder.getIntegerType(8)), 
+            str, ArrayRef<mlir::Value>({cst0, cst0}));
+        }
+        // 生成添加的dump指令
+        auto vc = ValueCategory(builder.create<mlir::visualgo::DumpIntOp>(loc, str, t1), false);
+        return make_pair(
+            vc,
+            true);
+      }
     }
   }
 

@@ -59,7 +59,10 @@
 #include <fstream>
 
 #include "polygeist/Dialect.h"
+#include "visualgo/Dialect.h"
+
 #include "polygeist/Passes/Passes.h"
+#include "visualgo/Passes/Passes.h"
 
 #include "ArgumentList.h"
 
@@ -501,6 +504,7 @@ int main(int argc, char **argv) {
   context.getOrLoadDialect<mlir::memref::MemRefDialect>();
   context.getOrLoadDialect<mlir::linalg::LinalgDialect>();
   context.getOrLoadDialect<mlir::polygeist::PolygeistDialect>();
+  context.getOrLoadDialect<mlir::visualgo::VisualgoDialect>();
 
   LLVM::LLVMFunctionType::attachInterface<MemRefInsider>(context);
   LLVM::LLVMPointerType::attachInterface<MemRefInsider>(context);
@@ -862,6 +866,16 @@ int main(int argc, char **argv) {
 #endif
 
     if (EmitLLVM || !EmitAssembly || EmitOpenMPIR || EmitLLVMDialect) {
+      // run visualgoToLLVM pass
+
+      mlir::PassManager pmvis(&context);
+      pmvis.addPass(visualgo::createConvertVisualgoToLLVMPass());
+      if (mlir::failed(pmvis.run(module.get()))) {
+        llvm::errs() << "in my pattern error "  << "\n";
+          module->dump();
+          return 10;
+      }
+
       mlir::PassManager pm2(&context);
       if (SCFOpenMP) {
         pm2.addPass(createConvertSCFToOpenMPPass());
@@ -873,6 +887,7 @@ int main(int argc, char **argv) {
         pm2.addPass(mlir::createCanonicalizerPass(canonicalizerConfig, {}, {}));
       }
       pm.nest<mlir::func::FuncOp>().addPass(polygeist::createMem2RegPass());
+
       pm2.addPass(mlir::createCSEPass());
       pm2.addPass(mlir::createCanonicalizerPass(canonicalizerConfig, {}, {}));
       if (mlir::failed(pm2.run(module.get()))) {
@@ -923,6 +938,7 @@ int main(int argc, char **argv) {
         pm3.addPass(polygeist::createConvertPolygeistToLLVMPass(
             options, CStyleMemRef, /* onlyGpuModules */ false));
         pm3.addPass(mlir::createCanonicalizerPass(canonicalizerConfig, {}, {}));
+        // pm3.addPass(visualgo::createConvertVisualgoToLLVMPass());
 
         if (mlir::failed(pm3.run(module.get()))) {
           module->dump();

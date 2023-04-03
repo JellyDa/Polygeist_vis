@@ -51,6 +51,7 @@ target_compile_definitions(cgeist PUBLIC -DLLVM_OBJ_ROOT="${LLVM_BINARY_DIR}")
 target_link_libraries(cgeist PRIVATE
   MLIRSCFTransforms
   MLIRPolygeist
+  MLIRVisualgo
 
   MLIRSupport
   MLIRIR
@@ -68,6 +69,7 @@ target_link_libraries(cgeist PRIVATE
   MLIRMathToLLVM
   MLIRTargetLLVMIRImport
   MLIRPolygeistTransforms
+  MLIRVisualgoTransforms
   MLIRLLVMToLLVMIRTranslation
   MLIRSCFToOpenMP
   MLIROpenMPToLLVM
@@ -84,5 +86,5 @@ target_link_libraries(cgeist PRIVATE
   clangLex
   clangSerialization
 )
-add_dependencies(cgeist MLIRPolygeistOpsIncGen MLIRPolygeistPassIncGen)
+add_dependencies(cgeist MLIRPolygeistOpsIncGen  MLIRVisualgoOpsIncGen MLIRPolygeistPassIncGen MLIRVisualgoPassIncGen)
 add_subdirectory(Test)

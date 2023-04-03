@@ -28,10 +28,11 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
   set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard to conform to")
 
+  set(MLIR_DIR /home/xiaopeng/llvm/visualgo/Polygeist_vis/build/../llvm-project/build/lib/cmake/mlir)
   message(STATUS "Searching for MLIRConfig.cmake in: ${MLIR_DIR}")
   find_package(MLIR REQUIRED CONFIG)
 
-  set(Clang_DIR ${CLANG_DIR})
+  set(Clang_DIR /home/xiaopeng/llvm/visualgo/Polygeist_vis/build/../llvm-project/build/lib/cmake/clang)
   message(STATUS "Searching for ClangConfig.cmake in: ${Clang_DIR}")
   find_package(Clang REQUIRED CONFIG)
 

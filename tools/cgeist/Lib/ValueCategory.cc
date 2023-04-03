@@ -14,6 +14,7 @@
 #include "mlir/IR/OpDefinition.h"
 #include "mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h"
 #include "polygeist/Ops.h"
+#include "visualgo/Ops.h"
 
 using namespace mlir;
 using namespace mlir::arith;

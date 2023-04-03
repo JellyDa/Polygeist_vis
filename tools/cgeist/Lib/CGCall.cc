@@ -93,6 +93,7 @@ ValueCategory MLIRScanner::CallHelper(
   // map from declaration name to mlir::value
   std::map<std::string, mlir::Value> mapFuncOperands;
 
+  // 处理参数，以生成对应的Value
   for (auto pair : arguments) {
 
     ValueCategory arg = std::get<0>(pair);
@@ -108,6 +109,7 @@ ValueCategory MLIRScanner::CallHelper(
         mapFuncOperands.insert(
             make_pair(dre->getDecl()->getName().str(), arg.val));
 
+    // 判断当前处理的参数数量是否与函数匹配
     if (i >= fnType.getInputs().size() || (i != 0 && a == nullptr)) {
       expr->dump();
       tocall.dump();
